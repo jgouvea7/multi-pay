@@ -31,6 +31,7 @@ public class PaymentService {
     private HealtHttpClient healtHttpClient;
 
 
+
     /**
      * Processa o pagamento enviando os dados para um dos gateways disponíveis (PagPay ou Pagsafe).
      * Salva o pagamento inicialmente com status PENDING e tenta o envio com retries.

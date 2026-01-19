@@ -48,33 +48,31 @@ Além disso, o projeto agora conta com o Health Check, um microsserviço dedicad
     - **8002** para `payment-pagsafe`
     - **8003** para `health-check`
 
-
-
-
+  
 ```mermaid
 graph TD
   Client[Cliente] -->|POST /process-payments| PaymentProcess[payment-process]
   
-  HealthCheck -->|GET /v1/health-check| PagPay[payment-pagpay]
-  HealthCheck -->|GET /v1/health-check| PagSafe[payment-pagsafe]
+  HealthCheck -->|GET /v1/health-check | PagPay[payment-pagpay]
+  HealthCheck -->|GET /v1/health-check | PagSafe[payment-pagsafe]
 
-  PaymentProcess -->|POST /v1/pagpay/ - até 3 tentativas| PagPay[payment-pagpay - principal]
+  PaymentProcess -->|POST /v1/pagpay/ - até 3 tentativas | PagPay[payment-pagpay - principal]
   PagPay -- Falha após 3 tentativas --> PaymentProcessRetry[payment-process]
-  PaymentProcessRetry -->|POST /v1/pagsafe/| PagSafe[payment-pagsafe - fallback]
+  PaymentProcessRetry -->|POST /v1/pagsafe/ | PagSafe[payment-pagsafe - fallback]
   
   PagSafe -- Sucesso --> PaymentProcess
   PagSafe -- Falha --> PaymentProcess
   
   PaymentProcess -->|Retorna resultado - sucesso ou erro| Client
 
-  Client -->|GET /get-payments| PaymentProcess
-  Client -->|DELETE /delete-all| PaymentProcess
+  Client -->|GET /get-payments | PaymentProcess
+  Client -->|DELETE /delete-all | PaymentProcess
 
-  Client -->|GET /v1/pagpay/ PagPay
-  Client -->|DELETE /v1/pagpay/| PagPay
+  Client -->|GET /v1/pagpay/ | PagPay
+  Client -->|DELETE /v1/pagpay/ | PagPay
 
-  Client -->|GET /v1/pagsafe/ PagSafe
-  Client -->|DELETE /v1/pagsafe/| PagSafe
+  Client -->|GET /v1/pagsafe/ | PagSafe
+  Client -->|DELETE /v1/pagsafe/ | PagSafe
 ```
 
 ## Tecnologias Utilizadas
