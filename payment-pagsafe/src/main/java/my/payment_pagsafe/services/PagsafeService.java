@@ -1,5 +1,6 @@
 package my.payment_pagsafe.services;
 
+import lombok.RequiredArgsConstructor;
 import my.payment_pagsafe.domain.dto.PaymentDto;
 import my.payment_pagsafe.domain.entity.Pagsafe;
 import my.payment_pagsafe.domain.entity.PagsafeStatus;
@@ -17,7 +18,6 @@ public class PagsafeService {
 
     @Autowired
     private KafkaProducer kafkaProducer;
-
     @Autowired
     private PagsafeRepository pagsafeRepository;
 

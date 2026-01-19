@@ -1,5 +1,6 @@
 package my.payment_pagpay.services;
 
+import lombok.RequiredArgsConstructor;
 import my.payment_pagpay.domain.dto.PaymentDto;
 import my.payment_pagpay.domain.entity.Pagpay;
 import my.payment_pagpay.domain.entity.PagpayStatus;

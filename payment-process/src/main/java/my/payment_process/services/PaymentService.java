@@ -1,5 +1,7 @@
 package my.payment_process.services;
 
+import lombok.RequiredArgsConstructor;
+import my.payment_process.domain.dto.HealthCheckResponse;
 import my.payment_process.domain.dto.PaymentDto;
 import my.payment_process.domain.entity.Payment;
 import my.payment_process.domain.entity.PaymentStatus;
@@ -12,7 +14,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Stream;
 
 @Service
 public class PaymentService {
@@ -23,6 +27,9 @@ public class PaymentService {
     @Autowired
     private RestTemplate restTemplate;
 
+    @Autowired
+    private HealtHttpClient healtHttpClient;
+
 
     /**
      * Processa o pagamento enviando os dados para um dos gateways disponíveis (PagPay ou Pagsafe).
@@ -31,6 +38,7 @@ public class PaymentService {
      */
     @Transactional
     public ResponseEntity<Void> processPayment(PaymentDto paymentDto) {
+
         PaymentDto savedDto = new PaymentDto();
         savedDto.setUsername(paymentDto.getUsername());
         savedDto.setMethods(paymentDto.getMethods());
@@ -38,28 +46,62 @@ public class PaymentService {
         savedDto.setStatus(PaymentStatus.PENDING);
         savedDto = savePayments(savedDto);
 
+        HealthCheckResponse pagPayHealth = healtHttpClient.getHealthStatus("PagPay");
+        HealthCheckResponse pagSafeHealth = healtHttpClient.getHealthStatus("PagSafe");
+
+        String selectedService = selectBestService(pagPayHealth, pagSafeHealth);
+
+        if (selectedService != null) {
+            String url = selectedService.equals("PagPay")
+                    ? "http://payment-pagpay:8001/v1/pagpay/"
+                    : "http://payment-pagsafe:8002/v1/pagsafe/";
+
+            if (tryProcess(url, savedDto)) {
+                return ResponseEntity.ok().build();
+            }
+
+            String fallbackService = selectedService.equals("PagPay") ? "PagSafe" : "PagPay";
+            String fallbackUrl = fallbackService.equals("PagPay")
+                    ? "http://payment-pagpay:8001/v1/pagpay/"
+                    : "http://payment-pagsafe:8002/v1/pagsafe/";
+
+            HealthCheckResponse fallbackHealth = fallbackService.equals("PagPay") ? pagPayHealth : pagSafeHealth;
+
+             if (isHealthy(fallbackHealth) && tryProcess(fallbackUrl, savedDto)) {
+                 return ResponseEntity.ok().build();
+             }
+        }
+
+        return ResponseEntity.status(503).build();
+    }
+
+    private boolean isHealthy(HealthCheckResponse health) {
+        return "UP".equals(health.getStatus()) || "DEGRADED".equals(health.getStatus());
+    }
+
+    private String selectBestService(HealthCheckResponse pagPay, HealthCheckResponse pagSafe) {
+        if (isHealthy(pagPay)) {
+            return "PagPay";
+        }
+
+        if (isHealthy(pagSafe)) {
+            return "PagSafe";
+        }
+
+        return null;
+    }
+
+    private boolean tryProcess(String url, PaymentDto dto) {
         int MAX_RETRY = 3;
-        for(int RETRY = 1; RETRY <= MAX_RETRY; RETRY++) {
+        for (int retry = 1; retry <= MAX_RETRY; retry++) {
             try {
-                ResponseEntity<String> response = restTemplate.postForEntity("http://payment-pagpay:8001/pagpay/payments", savedDto, String.class);
-                return ResponseEntity.ok().build();
+                restTemplate.postForEntity(url, dto, Void.class);
+                return true;
             } catch (Exception e) {
-                try { Thread.sleep(1000); } catch (InterruptedException ignored){}
+                try { Thread.sleep(100); } catch (InterruptedException ignored) {}
             }
         }
-
-        // Tentativa de pagamento no Pagsafe
-        for(int RETRY = 1; RETRY <= MAX_RETRY; RETRY++) {
-            try {
-                ResponseEntity<String> response = restTemplate.postForEntity("http://payment-pagsafe:8002/pagsafe/payments", savedDto, String.class);
-                return ResponseEntity.ok().build();
-            } catch (Exception e) {
-                try { Thread.sleep(150); } catch (InterruptedException ignored){}
-            }
-        }
-
-        // Todas tentativas falharam
-        return ResponseEntity.status(502).build();
+        return false;
     }
 
     /**

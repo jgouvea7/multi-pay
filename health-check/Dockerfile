@@ -1,9 +1,9 @@
 FROM eclipse-temurin:24-jdk
 
-WORKDIR /payment-pagpay
+WORKDIR /health-check
 
 COPY target/*.jar app.jar
 
-EXPOSE 8001
+EXPOSE 8000
 
 CMD ["java", "-jar", "app.jar"]

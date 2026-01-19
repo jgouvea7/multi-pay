@@ -7,6 +7,7 @@
         <option value="$PROJECT_DIR$/payment-pagpay/pom.xml" />
         <option value="$PROJECT_DIR$/payment-pagsafe/pom.xml" />
         <option value="$PROJECT_DIR$/payment-process/pom.xml" />
+        <option value="$PROJECT_DIR$/health-check/pom.xml" />
       </list>
     </option>
   </component>

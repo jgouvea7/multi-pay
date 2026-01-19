@@ -6,7 +6,7 @@ services:
       - "5432:5432"
     environment:
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: jonnathas1524
+      POSTGRES_PASSWORD: 1234
     volumes:
       - ./scripts/:/docker-entrypoint-initdb.d/
       - pgdata:/var/lib/postgresql/data
@@ -37,10 +37,11 @@ services:
     depends_on:
       - postgres
       - kafka
+      - health-check
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/payment-process
       SPRING_DATASOURCE_USERNAME: postgres
-      SPRING_DATASOURCE_PASSWORD: jonnathas1524
+      SPRING_DATASOURCE_PASSWORD: 1234
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
     deploy:
       resources:
@@ -57,7 +58,7 @@ services:
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/payment-pagpay
       SPRING_DATASOURCE_USERNAME: postgres
-      SPRING_DATASOURCE_PASSWORD: jonnathas1524
+      SPRING_DATASOURCE_PASSWORD: 1234
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
     deploy:
       resources:
@@ -74,13 +75,21 @@ services:
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/payment-pagsafe
       SPRING_DATASOURCE_USERNAME: postgres
-      SPRING_DATASOURCE_PASSWORD: jonnathas1524
+      SPRING_DATASOURCE_PASSWORD: 1234
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
     deploy:
       resources:
         limits:
           cpus: "2.0"
 
+  health-check:
+    build: ./health-check
+    ports:
+      - "8003:8003"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/health-check
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: 1234
 
 volumes:
   pgdata:
