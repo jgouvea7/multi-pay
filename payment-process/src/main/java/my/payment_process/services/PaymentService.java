@@ -126,12 +126,9 @@ public class PaymentService {
      */
     @KafkaListener(topics = "payment-topic", groupId = "payment-consumer-group", containerFactory = "kafkaListenerContainerFactory")
     public void consumerPayment(PaymentDto paymentDto){
-        Payment payment = new Payment();
+        Payment payment = paymentRepository.findByProcessId(paymentDto.getProcessId());
         payment.setProcessId(paymentDto.getProcessId());
-        payment.setUsername(paymentDto.getUsername());
         payment.setName(paymentDto.getName());
-        payment.setMethods(paymentDto.getMethods());
-        payment.setAmount(paymentDto.getAmount());
         payment.setTax(paymentDto.getTax());
         payment.setTotal(paymentDto.getTotal());
         payment.setStatus(paymentDto.getStatus());
