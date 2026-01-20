@@ -170,12 +170,33 @@ graph TD
 }
 ```
 
+### Exemplo de falha
+
+Caso nenhum evento de sucesso ou falha seja recebido, uma tarefa agendada é executada periodicamente para lidar com pagamentos pendentes.
+
+Essa tarefa verifica os pagamentos com status `PENDING` e os atualiza para `FAILURE` após um tempo limite configurado, impedindo que os pagamentos permaneçam em um estado indeterminado.
+
+```json
+{
+  "eventId": "9591e705-e6f3-461a-ad32-1f38e213e760",
+  "processId": "992dfc6a-6762-4c29-9551-b6ce30ef7fb0",
+  "username": "user123",
+  "name": null,
+  "methods": "CREDIT",
+  "amount": 88.32,
+  "tax": null,
+  "total": null,
+  "status": "FAILURE",
+  "createdAt": "2025-07-09T17:10:22.888460Z"
+}
+```
+
 ## Como Rodar
 1. Certifique-se de ter o Docker instalado na sua máquina.
 
 2. Clone o repositório:
 ```bash
-  git clone https://github.com/Aegdae/MultiPay.git
+  git clone https://github.com/jgouvea7/multi-pay.git
 ```
 3. Navegue até a pasta do projeto e execute o Docker Compose para subir todos os serviços:
 ```bash
