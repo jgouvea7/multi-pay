@@ -27,6 +27,7 @@ public class PaymentController {
         return ResponseEntity.ok(listPayements);
     }
 
+
     @DeleteMapping("/delete-all")
     public ResponseEntity<?> deleteAll() {
         paymentService.deletAll();

@@ -1,9 +1,5 @@
 # MultiPay
 
-![Java](https://img.shields.io/badge/Java-24+-blue?logo=java)
-![Docker](https://img.shields.io/badge/Docker-Active-blue?logo=docker)
-![License](https://img.shields.io/badge/License-MIT-green)
-
 ## Aviso de Segurança
 
 ⚠️ **ATENÇÃO:** Este projeto é para fins de estudo e desenvolvimento local.  

@@ -1,6 +1,5 @@
 package my.payment_process.services;
 
-import lombok.RequiredArgsConstructor;
 import my.payment_process.domain.dto.HealthCheckResponse;
 import my.payment_process.domain.dto.PaymentDto;
 import my.payment_process.domain.entity.Payment;
@@ -14,9 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Stream;
 
 @Service
 public class PaymentService {
@@ -35,7 +32,6 @@ public class PaymentService {
     /**
      * Processa o pagamento enviando os dados para um dos gateways disponíveis (PagPay ou Pagsafe).
      * Salva o pagamento inicialmente com status PENDING e tenta o envio com retries.
-     * Retorna 200 em caso de sucesso ou 502 em caso de falha em ambos os gateways.
      */
     @Transactional
     public ResponseEntity<Void> processPayment(PaymentDto paymentDto) {
